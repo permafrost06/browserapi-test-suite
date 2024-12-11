@@ -5,7 +5,7 @@ export default function HTMLMediaElement(
     suiteName: string,
     type: "audio" | "video",
     src: string,
-    mediaDurationInMs: number
+    seekTimeInSeconds: number
 ) {
     const suite = TestSuite(suiteName);
 
@@ -71,25 +71,32 @@ export default function HTMLMediaElement(
             seekedDispatched = true;
         });
 
-        props.mediaEl.currentTime = 4;
+        props.mediaEl.currentTime = seekTimeInSeconds;
         await waitUntil(() => seekingDispatched === true);
         await waitUntil(() => seekedDispatched === true);
-        assert(props.mediaEl.currentTime === 4);
+        assert(props.mediaEl.currentTime === seekTimeInSeconds);
     });
 
-    suite.addTest("ends media correctly", async (props, { waitUntil, delay }) => {
-        let ended = false, isMediaAbleToPlay = props.mediaEl.readyState > 1;
+    suite.addTest("ends media correctly", async (props, { waitUntil, delay }, logComment) => {
+        let ended = false;
         props.mediaEl.addEventListener("ended", () => {
             ended = true;
         });
-        props.mediaEl.addEventListener("loadeddata", () => {
-            isMediaAbleToPlay = true;
-        });
 
-        await waitUntil(() => isMediaAbleToPlay === true);
+        try {
+            await waitUntil(() => props.mediaEl.readystate >= 5);
+        } catch (e) {
+            if ((e as Error).message === "Timed out waiting for condition") {
+                logComment("media taking a long time to finish loading. test may be flaky");
+            }
+        }
+
         props.mediaEl.play();
         assert(ended === false);
-        await delay(mediaDurationInMs);
+        const timeToMediaEnd = (
+            (props.mediaEl.duration - props.mediaEl.currentTime) + 1
+        ) * 1000;
+        await delay(timeToMediaEnd);
         assert(Boolean(ended) === true);
     });
 

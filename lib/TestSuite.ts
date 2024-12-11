@@ -22,6 +22,12 @@ export type ErrorLoggerFn = (
     e: Error
 ) => (Promise<void> | void);
 
+export type TestFn = (
+    props: Props,
+    helpers: HelperFns,
+    logComment: (comment: string) => Promise<void>
+) => void | Promise<void>;
+
 export default function TestSuiteSetup(
     logger: LoggerFn = logToConsole, errorLogger: ErrorLoggerFn = logErrorToConsole
 ) {
@@ -38,7 +44,7 @@ function TestSuite(
     let teardownFn: () => void;
     let tests: Array<{
         description: string;
-        testFn: (props: Props, helpers: HelperFns) => void | Promise<void>;
+        testFn: TestFn;
     }> = [];
     let results: Array<{
         description: string;
@@ -57,7 +63,7 @@ function TestSuite(
 
     async function addTest(
         description: string,
-        testFn: (props: Props, helpers: HelperFns) => (void | Promise<void>),
+        testFn: TestFn,
     ) {
         tests.push({ description, testFn });
     }
@@ -68,7 +74,7 @@ function TestSuite(
 
         for (const test of tests) {
             try {
-                await test.testFn(props, { delay, waitUntil });
+                await test.testFn(props, { delay, waitUntil }, logComment);
             } catch (e) {
                 await errorLogger(name, test.description, e as Error);
                 results.push({
@@ -83,6 +89,10 @@ function TestSuite(
         }
 
         teardownFn();
+    }
+
+    async function logComment(comment: string) {
+        await logger(name, comment);
     }
 
     async function getResults() {
