@@ -11,16 +11,27 @@ export type HelperFns = {
     ) => Promise<void>;
 };
 
+export type LoggerFn = (
+    suiteName: string,
+    description: string
+) => (Promise<void> | void);
+
+export type ErrorLoggerFn = (
+    suiteName: string,
+    description: string,
+    e: Error
+) => (Promise<void> | void);
+
 export default function TestSuiteSetup(
-    logger = logToConsole, errorLogger = logErrorToConsole
+    logger: LoggerFn = logToConsole, errorLogger: ErrorLoggerFn = logErrorToConsole
 ) {
     return (name: string) => TestSuite(name, logger, errorLogger);
 }
 
 function TestSuite(
     name: string,
-    logger: (suiteName: string, description: string) => void,
-    errorLogger: (suiteName: string, description: string, e: Error) => void
+    logger: LoggerFn,
+    errorLogger: ErrorLoggerFn,
 ) {
     let props: Record<string, any>;
     let setupFn: () => Props;
@@ -59,7 +70,7 @@ function TestSuite(
             try {
                 await test.testFn(props, { delay, waitUntil });
             } catch (e) {
-                errorLogger(name, test.description, e as Error);
+                await errorLogger(name, test.description, e as Error);
                 results.push({
                     description: test.description,
                     status: "fail",
@@ -67,7 +78,7 @@ function TestSuite(
                 });
                 continue;
             }
-            logger(name, test.description);
+            await logger(name, test.description);
             results.push({ description: test.description, status: "pass" });
         }
 
