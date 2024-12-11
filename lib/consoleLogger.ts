@@ -3,6 +3,6 @@ export function logToConsole(description: string) {
 }
 
 export function logErrorToConsole(description: string, e: Error) {
-    console.log(`test "${description}" failed: ` + " " + e);
+    console.error(`test "${description}" failed: ` + " " + e);
 }
 
