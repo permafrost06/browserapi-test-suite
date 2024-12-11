@@ -1,3 +1,5 @@
-import * as tests from "./tests";
+import tests from "./tests";
 
-tests.videoTest.run();
+for (let i = 0; i < tests.length; i++) {
+    await tests[i].run();
+}

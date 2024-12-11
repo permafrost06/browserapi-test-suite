@@ -1,1 +1,3 @@
-export { default as videoTest } from "./video";
+import { localTest, remoteTest } from "./video";
+
+export default [ localTest, remoteTest ];
