@@ -14,12 +14,13 @@ export type HelperFns = {
 export default function TestSuiteSetup(
     logger = logToConsole, errorLogger = logErrorToConsole
 ) {
-    return () => TestSuite(logger, errorLogger);
+    return (name: string) => TestSuite(name, logger, errorLogger);
 }
 
 function TestSuite(
-    logger: (description: string) => void,
-    errorLogger: (description: string, e: Error) => void
+    name: string,
+    logger: (suiteName: string, description: string) => void,
+    errorLogger: (suiteName: string, description: string, e: Error) => void
 ) {
     let props: Record<string, any>;
     let setupFn: () => Props;
@@ -58,7 +59,7 @@ function TestSuite(
             try {
                 await test.testFn(props, { delay, waitUntil });
             } catch (e) {
-                errorLogger(test.description, e as Error);
+                errorLogger(name, test.description, e as Error);
                 results.push({
                     description: test.description,
                     status: "fail",
@@ -66,7 +67,7 @@ function TestSuite(
                 });
                 continue;
             }
-            logger(test.description);
+            logger(name, test.description);
             results.push({ description: test.description, status: "pass" });
         }
 

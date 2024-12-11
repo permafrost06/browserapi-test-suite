@@ -2,11 +2,12 @@ import { assert } from "chai";
 import TestSuite from "../setup";
 
 export default function HTMLMediaElement(
+    suiteName: string,
     type: "audio" | "video",
     src: string,
     mediaDurationInMs: number
 ) {
-    const suite = TestSuite();
+    const suite = TestSuite(suiteName);
 
     suite.setup(() => {
         const mediaEl = document.createElement(type);

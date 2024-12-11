@@ -1,8 +1,8 @@
-export function logToConsole(description: string) {
-    console.log(`test "${description}" passed`);
+export function logToConsole(suiteName: string, description: string) {
+    console.log(`${suiteName}: test "${description}" passed`);
 }
 
-export function logErrorToConsole(description: string, e: Error) {
-    console.error(`test "${description}" failed: ` + " " + e);
+export function logErrorToConsole(suiteName: string, description: string, e: Error) {
+    console.error(`${suiteName}: test "${description}" failed: ` + " " + e);
 }
 
