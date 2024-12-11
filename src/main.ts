@@ -5,6 +5,7 @@ const videoEl = document.createElement("video");
 videoEl.src = "/sample-10s.mp4";
 videoEl.id = "test_video";
 videoEl.controls = true;
+videoEl.muted = true;
 document.body.appendChild(videoEl);
 
 test("supports video", () => {
