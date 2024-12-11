@@ -1,3 +1,9 @@
-import { localTest, remoteTest } from "./video";
+import { localVideoTest, remoteVideoTest } from "./video";
+import { localAudioTest, remoteAudioTest } from "./audio";
 
-export default [ localTest, remoteTest ];
+export default [
+    localVideoTest,
+    remoteVideoTest,
+    localAudioTest,
+    remoteAudioTest,
+];
