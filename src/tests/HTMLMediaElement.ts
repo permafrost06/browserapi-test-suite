@@ -84,7 +84,7 @@ export default function HTMLMediaElement(
         });
 
         try {
-            await waitUntil(() => props.mediaEl.readystate >= 5);
+            await waitUntil(() => props.mediaEl.readyState >= 5);
         } catch (e) {
             if ((e as Error).message === "Timed out waiting for condition") {
                 logComment("media taking a long time to finish loading. test may be flaky");
