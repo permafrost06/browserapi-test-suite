@@ -1,4 +1,5 @@
 import HTMLMediaElement from "./HTMLMediaElement";
+import WebAudio from "./WebAudio";
 
 const localAudioFile = "/sample-9s.mp3";
 export const localAudioTest = HTMLMediaElement(
@@ -13,3 +14,9 @@ export const remoteAudioTest = HTMLMediaElement(
     "audio",
     remoteAudioFile,
 );
+
+export const localWebAudioTest = WebAudio(
+    "localWebAudioTest",
+    localAudioFile,
+);
+

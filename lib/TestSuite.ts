@@ -25,14 +25,14 @@ export type ErrorLoggerFn = (
 export function defineLoggers(
     logger: LoggerFn = logToConsole, errorLogger: ErrorLoggerFn = logErrorToConsole
 ) {
-    return function createTestSuite <T>(name: string, setupFn: () => T) {
+    return function createTestSuite <T>(name: string, setupFn: (helpers: HelperFns) => (T | Promise<T>)) {
         return TestSuite(name, setupFn, logger, errorLogger);
     }
 }
 
 export default function TestSuite<T>(
     name: string,
-    setupFn: () => T,
+    setupFn: (helpers: HelperFns) => (T | Promise<T>),
     logger: LoggerFn,
     errorLogger: ErrorLoggerFn,
 ) {
@@ -70,7 +70,7 @@ export default function TestSuite<T>(
 
     async function run() {
         testsRun = true;
-        const props = setupFn();
+        const props = await setupFn({ delay, waitUntil });
 
         for (const test of tests) {
             try {
