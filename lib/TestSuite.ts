@@ -39,7 +39,6 @@ function TestSuite(
     logger: LoggerFn,
     errorLogger: ErrorLoggerFn,
 ) {
-    let props: Record<string, any>;
     let setupFn: () => Props;
     let teardownFn: () => void;
     let tests: Array<{
@@ -70,7 +69,7 @@ function TestSuite(
 
     async function run() {
         testsRun = true;
-        props = setupFn();
+        const props = setupFn();
 
         for (const test of tests) {
             try {
