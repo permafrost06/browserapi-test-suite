@@ -5,9 +5,10 @@ export default function HTMLMediaElement(
     suiteName: string,
     type: "audio" | "video",
     src: string,
-    seekTimeInSeconds: number
 ) {
     const suite = TestSuite(suiteName);
+    let durationInMs: number;
+    let seekTimeInSeconds: number;
 
     suite.setup(() => {
         const mediaEl = document.createElement(type);
@@ -16,6 +17,8 @@ export default function HTMLMediaElement(
         mediaEl.controls = true;
         mediaEl.muted = true;
         document.body.appendChild(mediaEl);
+        durationInMs = mediaEl.duration;
+        seekTimeInSeconds = Math.floor(durationInMs * .5);
 
         return { mediaEl };
     });
@@ -94,7 +97,7 @@ export default function HTMLMediaElement(
         props.mediaEl.play();
         assert(ended === false);
         const timeToMediaEnd = (
-            (props.mediaEl.duration - props.mediaEl.currentTime) + 1
+            (durationInMs - props.mediaEl.currentTime) + 1
         ) * 1000;
         await delay(timeToMediaEnd);
         assert(Boolean(ended) === true);
