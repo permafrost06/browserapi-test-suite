@@ -21,8 +21,8 @@ export default function HTMLMediaElement(
     let durationInMs: number;
     let seekTimeInSeconds: number;
 
-    suite.teardown(() => {
-        document.body.replaceChildren();
+    suite.teardown((props) => {
+        props.mediaEl.remove();
     });
 
     suite.addTest("supports media", (props) => {

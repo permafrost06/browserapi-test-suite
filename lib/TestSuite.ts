@@ -36,7 +36,7 @@ export default function TestSuite<T>(
     logger: LoggerFn,
     errorLogger: ErrorLoggerFn,
 ) {
-    let teardownFn: () => void;
+    let teardownFn: (props: T) => void;
     let tests: Array<{
         description: string;
         testFn: (
@@ -52,7 +52,7 @@ export default function TestSuite<T>(
     }> = [];
     let testsRun = false;
 
-    function teardown(fn: () => void) {
+    function teardown(fn: (props: T) => void) {
         teardownFn = fn;
     }
 
@@ -87,7 +87,7 @@ export default function TestSuite<T>(
             results.push({ description: test.description, status: "pass" });
         }
 
-        teardownFn();
+        teardownFn(props);
     }
 
     async function logComment(comment: string) {
