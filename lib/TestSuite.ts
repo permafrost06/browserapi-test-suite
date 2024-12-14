@@ -22,28 +22,28 @@ export type ErrorLoggerFn = (
     e: Error
 ) => (Promise<void> | void);
 
-export type TestFn = (
-    props: Props,
-    helpers: HelperFns,
-    logComment: (comment: string) => Promise<void>
-) => void | Promise<void>;
-
-export default function TestSuiteSetup(
+export function defineLoggers(
     logger: LoggerFn = logToConsole, errorLogger: ErrorLoggerFn = logErrorToConsole
 ) {
-    return (name: string) => TestSuite(name, logger, errorLogger);
+    return function createTestSuite <T>(name: string, setupFn: () => T) {
+        return TestSuite(name, setupFn, logger, errorLogger);
+    }
 }
 
-function TestSuite(
+export default function TestSuite<T>(
     name: string,
+    setupFn: () => T,
     logger: LoggerFn,
     errorLogger: ErrorLoggerFn,
 ) {
-    let setupFn: () => Props;
     let teardownFn: () => void;
     let tests: Array<{
         description: string;
-        testFn: TestFn;
+        testFn: (
+            props: T,
+            helpers: HelperFns,
+            logComment: (comment: string) => Promise<void>
+        ) => void | Promise<void>;
     }> = [];
     let results: Array<{
         description: string;
@@ -52,17 +52,17 @@ function TestSuite(
     }> = [];
     let testsRun = false;
 
-    function setup(fn: () => Props) {
-        setupFn = fn;
-    }
-
     function teardown(fn: () => void) {
         teardownFn = fn;
     }
 
     async function addTest(
         description: string,
-        testFn: TestFn,
+        testFn: (
+            props: T,
+            helpers: HelperFns,
+            logComment: (comment: string) => Promise<void>
+        ) => void | Promise<void>,
     ) {
         tests.push({ description, testFn });
     }
@@ -102,6 +102,6 @@ function TestSuite(
         return results;
     }
 
-    return { run, setup, teardown, addTest, getResults }
+    return { run, teardown, addTest, getResults }
 }
 

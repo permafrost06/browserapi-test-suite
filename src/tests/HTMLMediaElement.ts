@@ -1,16 +1,12 @@
 import { assert } from "chai";
-import TestSuite from "../setup";
+import createTestSuite from "../setup";
 
 export default function HTMLMediaElement(
     suiteName: string,
     type: "audio" | "video",
     src: string,
 ) {
-    const suite = TestSuite(suiteName);
-    let durationInMs: number;
-    let seekTimeInSeconds: number;
-
-    suite.setup(() => {
+    const suite = createTestSuite(suiteName, () => {
         const mediaEl = document.createElement(type);
         mediaEl.src = src;
         mediaEl.id = "test_" + type;
@@ -22,6 +18,8 @@ export default function HTMLMediaElement(
 
         return { mediaEl };
     });
+    let durationInMs: number;
+    let seekTimeInSeconds: number;
 
     suite.teardown(() => {
         document.body.replaceChildren();

@@ -1,3 +1,3 @@
-import TestSuiteSetup from "../lib/TestSuite";
+import { defineLoggers } from "../lib/TestSuite";
 
-export default TestSuiteSetup();
+export default defineLoggers();
