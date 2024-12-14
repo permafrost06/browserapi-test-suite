@@ -6,6 +6,9 @@ export default function HTMLMediaElement(
     type: "audio" | "video",
     src: string,
 ) {
+    let durationInMs: number;
+    let seekTimeInSeconds: number;
+
     const suite = createTestSuite(suiteName, () => {
         const mediaEl = document.createElement(type);
         mediaEl.src = src;
@@ -13,13 +16,9 @@ export default function HTMLMediaElement(
         mediaEl.controls = true;
         mediaEl.muted = true;
         document.body.appendChild(mediaEl);
-        durationInMs = mediaEl.duration;
-        seekTimeInSeconds = Math.floor(durationInMs * .5);
 
         return { mediaEl };
     });
-    let durationInMs: number;
-    let seekTimeInSeconds: number;
 
     suite.teardown((props) => {
         props.mediaEl.remove();
@@ -61,6 +60,9 @@ export default function HTMLMediaElement(
     suite.addTest("is able to seek", async (props, { waitUntil }) => {
         let seekingDispatched: boolean,
             seekedDispatched: boolean;
+
+        durationInMs = props.mediaEl.duration;
+        seekTimeInSeconds = Math.floor(durationInMs / 2);
 
         seekingDispatched = false;
         seekedDispatched = false;
