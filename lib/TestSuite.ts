@@ -45,9 +45,10 @@ export default function TestSuite<T>(
             logComment: (comment: string) => Promise<void>
         ) => void | Promise<void>;
     }> = [];
-    let results: Array<{
-        description: string;
-        status: "pass" | "fail";
+    let logs: Array<{
+        type: "comment" | "result",
+        content: string;
+        status?: "pass" | "fail";
         failReason?: Error;
     }> = [];
     let testsRun = false;
@@ -76,32 +77,28 @@ export default function TestSuite<T>(
                 await test.testFn(props, { delay, waitUntil }, logComment);
             } catch (e) {
                 await errorLogger(name, test.description, e as Error);
-                results.push({
-                    description: test.description,
+                logs.push({
+                    type: "result",
+                    content: test.description,
                     status: "fail",
                     failReason: e as Error
                 });
                 continue;
             }
             await logger(name, test.description);
-            results.push({ description: test.description, status: "pass" });
+            logs.push({ type: "result", content: test.description, status: "pass" });
         }
 
         teardownFn(props);
+
+        return logs;
     }
 
     async function logComment(comment: string) {
+        logs.push({ type: "comment", content: comment });
         await logger(name, comment);
     }
 
-    async function getResults() {
-        if (!testsRun) {
-            throw Error("Test suite has not yet been run. Call .run() to run suite.");
-        }
-
-        return results;
-    }
-
-    return { run, teardown, addTest, getResults }
+    return { run, teardown, addTest }
 }
 
