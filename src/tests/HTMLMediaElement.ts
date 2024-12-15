@@ -38,7 +38,7 @@ export default function HTMLMediaElement(
         });
 
         await waitUntil(() => loadeddataDispatched === true);
-        props.mediaEl.play();
+        await props.mediaEl.play();
         assert(props.mediaEl.paused === false);
 
         await waitUntil(() => playDispatched === true, 100, 1000);
@@ -88,7 +88,7 @@ export default function HTMLMediaElement(
             }
         }
 
-        props.mediaEl.play();
+        await props.mediaEl.play();
         assert(ended === false);
         await waitUntil(() => Boolean(ended) === true);
     });
