@@ -9,7 +9,7 @@ export default function HTMLMediaElement(
     let durationInMs: number;
     let seekTimeInSeconds: number;
 
-    const suite = createTestSuite(suiteName, () => {
+    function setup() {
         const mediaEl = document.createElement(type);
         mediaEl.src = src;
         mediaEl.id = "test_" + type;
@@ -18,11 +18,13 @@ export default function HTMLMediaElement(
         document.body.appendChild(mediaEl);
 
         return { mediaEl };
-    });
+    }
 
-    suite.teardown((props) => {
+    function teardown(props: ReturnType<typeof setup>) {
         props.mediaEl.remove();
-    });
+    }
+
+    const suite = createTestSuite(suiteName, setup, teardown);
 
     suite.addTest("supports media", (props) => {
         assert(!!props.mediaEl.canPlayType === true);
