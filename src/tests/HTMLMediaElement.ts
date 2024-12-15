@@ -97,7 +97,7 @@ export default function HTMLMediaElement(
         props.mediaEl.play();
         assert(ended === false);
         const timeToMediaEnd = (
-            (durationInMs - props.mediaEl.currentTime) + 1
+            (durationInMs/1000 - props.mediaEl.currentTime) + 1
         ) * 1000;
         await delay(timeToMediaEnd);
         assert(Boolean(ended) === true);
