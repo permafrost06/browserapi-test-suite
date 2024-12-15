@@ -36,19 +36,14 @@ export default function WebAudio(
             }
         }
 
-        return { context, source, buttonEl, mediaEl } as {
-            context: AudioContext;
-            source: MediaElementAudioSourceNode;
-            buttonEl: HTMLButtonElement;
-            mediaEl: HTMLAudioElement;
-        };
+        return { context, source, buttonEl, mediaEl };
     }
 
     function teardown(
         { source, context, buttonEl, mediaEl }: Awaited<ReturnType<typeof setup>>
     ) {
-        source.disconnect();
-        context.close();
+        source?.disconnect();
+        context?.close();
         mediaEl.remove();
         buttonEl.remove();
     };
