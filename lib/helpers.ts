@@ -16,7 +16,7 @@ export function waitUntil(callback: () => boolean, interval = 100, timeout = 100
             }
 
             if (hasTimedOut) {
-                reject("Timed out waiting for condition");
+                reject(new Error("Timed out waiting for condition"));
                 clearInterval(intervalID);
             }
         }, interval);
