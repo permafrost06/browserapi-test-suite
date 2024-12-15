@@ -56,7 +56,6 @@ export default function TestSuite<T>(
         status?: "pass" | "fail";
         failReason?: Error;
     }> = [];
-    let testsRun = false;
 
     async function addTest(
         description: string,
@@ -70,7 +69,6 @@ export default function TestSuite<T>(
     }
 
     async function run() {
-        testsRun = true;
         const props = await setupFn({ delay, waitUntil });
 
         for (const test of tests) {
