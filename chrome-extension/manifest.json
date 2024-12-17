@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Iframe Injector for Cloudfone Simulator",
+  "version": "1.0",
+  "description": "Injects an iframe into the Cloudfone Simulator page.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://www.cloudfone.com/my/simulator"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.cloudfone.com/my/simulator"],
+      "js": ["content.js"]
+    }
+  ]
+}
+
