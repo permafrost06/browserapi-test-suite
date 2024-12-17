@@ -98,6 +98,6 @@ export default function TestSuite<T>(
         await logger(name, comment);
     }
 
-    return { run, addTest }
+    return { run, addTest, suiteName: name }
 }
 
