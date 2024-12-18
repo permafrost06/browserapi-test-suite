@@ -34,5 +34,9 @@
             content: '▶';
         }
     }
+
+    iframe {
+        height: 100vh;
+    }
 }
 
