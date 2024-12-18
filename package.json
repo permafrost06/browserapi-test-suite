@@ -1,28 +1,28 @@
 {
-  "name": "cloudphone-test-suite",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "start": "node --experimental-strip-types server.ts"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "devDependencies": {
-    "@types/chai": "^5.0.1",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.10.2",
-    "@types/ws": "^8.5.13",
-    "typescript": "~5.6.2",
-    "vite": "^6.0.1"
-  },
-  "dependencies": {
-    "chai": "^5.1.2",
-    "express": "^4.21.2",
-    "ws": "^8.18.0"
-  }
+    "name": "cloudphone-test-suite",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "start": "node --experimental-strip-types server.ts"
+    },
+    "engines": {
+        "node": ">=22.0.0"
+    },
+    "devDependencies": {
+        "@types/chai": "^5.0.1",
+        "@types/express": "^5.0.0",
+        "@types/node": "^22.10.2",
+        "@types/ws": "^8.5.13",
+        "typescript": "~5.6.2",
+        "vite": "^6.0.1"
+    },
+    "dependencies": {
+        "chai": "^5.1.2",
+        "express": "^4.21.2",
+        "ws": "^8.18.0"
+    }
 }
