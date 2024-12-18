@@ -49,6 +49,17 @@ export default function TestSuite<T>(
             helpers: HelperFns,
             logComment: (comment: string) => Promise<void>
         ) => void | Promise<void>;
+        run: () => {
+        type: "comment" | "result",
+        content: string;
+        status?: "pass" | "fail";
+        failReason?: Error;
+    } | Promise<{
+        type: "comment" | "result",
+        content: string;
+        status?: "pass" | "fail";
+        failReason?: Error;
+    }>
     }> = [];
     let logs: Array<{
         type: "comment" | "result",
@@ -65,7 +76,28 @@ export default function TestSuite<T>(
             logComment: (comment: string) => Promise<void>
         ) => void | Promise<void>,
     ) {
-        tests.push({ description, testFn });
+        tests.push({
+            description,
+            testFn,
+            run: async () => {
+                const props = await setupFn({ delay, waitUntil });
+                try {
+                    await testFn(props, { delay, waitUntil }, logComment);
+                } catch (e) {
+                    await errorLogger(name, description, e as Error);
+                    await teardownFn(props);
+                    return {
+                        type: "result",
+                        content: description,
+                        status: "fail",
+                        failReason: e as Error
+                    };
+                }
+                await logger(name, description);
+                await teardownFn(props);
+                return { type: "result", content: description, status: "pass" };
+            }
+        });
     }
 
     async function run() {
@@ -98,6 +130,6 @@ export default function TestSuite<T>(
         await logger(name, comment);
     }
 
-    return { run, addTest, suiteName: name }
+    return { run, addTest, suiteName: name, tests }
 }
 

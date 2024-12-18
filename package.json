@@ -28,7 +28,9 @@
         "ws": "^8.18.0"
     },
     "nodemonConfig": {
-        "watch": ["dist", "server.ts"],
+        "watch": ["."],
+        "ignore": ["**/node_modules/**", "**/src/**"],
+        "ext": "ts,js,json",
         "exec": "node --experimental-strip-types server.ts"
     }
 }

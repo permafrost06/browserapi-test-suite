@@ -7,11 +7,45 @@ const reports: Record<string, Array<{
     failReason?: Error;
 }>> = {};
 
+const allTests: Record<string, Array<string>> = {};
+
 (async () => {
     for (const test of tests) {
         const suiteName = test.suiteName;
-        reports[suiteName] = await test.run();
+        allTests[suiteName] = test.tests.map(test => test.description);
     }
+
+    await fetch("http://localhost:5173/register-tester", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allTests),
+    });
+
+    for (const suite of tests) {
+        const suiteName = suite.suiteName;
+        for (const test of suite.tests) {
+            const testResult = await test.run();
+            if (!reports[suiteName]) {
+                reports[suiteName] = [];
+            }
+            reports[suiteName].push(testResult);
+
+            await fetch("http://localhost:5173/test-result", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    suiteName,
+                    test: test.description,
+                    result: {
+                        status: testResult.status,
+                        error: testResult.failReason?.name,
+                        errMsg: testResult.failReason?.message,
+                    }
+                }),
+            });
+        }
+    }
+
     // window.reports = reports;
     document.body.innerText = "All tests have finished running"
     // const pre = document.createElement("pre");
