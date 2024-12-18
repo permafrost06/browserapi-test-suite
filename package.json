@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
+        "dev": "concurrently \"vite build --watch\" \"nodemon\"",
         "build": "tsc && vite build",
         "preview": "vite preview",
         "start": "node --experimental-strip-types server.ts"
@@ -17,6 +17,8 @@
         "@types/express": "^5.0.0",
         "@types/node": "^22.10.2",
         "@types/ws": "^8.5.13",
+        "concurrently": "^9.1.0",
+        "nodemon": "^3.1.9",
         "typescript": "~5.6.2",
         "vite": "^6.0.1"
     },
@@ -24,5 +26,9 @@
         "chai": "^5.1.2",
         "express": "^4.21.2",
         "ws": "^8.18.0"
+    },
+    "nodemonConfig": {
+        "watch": ["dist", "server.ts"],
+        "exec": "node --experimental-strip-types server.ts"
     }
 }
