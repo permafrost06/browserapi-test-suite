@@ -15,8 +15,12 @@ app.get("/", (_: Request, res: Response) => {
   res.sendFile(join(__dirname, "dist", "index.html"));
 });
 
-app.get("/test", (_: Request, res: Response) => {
-  res.sendFile(join(__dirname, "dist", "test.html"));
+app.get("/watcher", (_: Request, res: Response) => {
+  res.sendFile(join(__dirname, "dist", "watcher.html"));
+});
+
+app.get("/runner", (_: Request, res: Response) => {
+  res.sendFile(join(__dirname, "dist", "runner.html"));
 });
 
 const server = createServer(app);
