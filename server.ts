@@ -24,9 +24,9 @@ app.get("/runner", (_: Request, res: Response) => {
 });
 
 const server = createServer(app);
-const wss = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({ server });
 
-wss.on("connection", (ws) => {
+wsServer.on("connection", (ws) => {
     console.log("Client connected");
 
     ws.send("Hello from WebSocket server!");
