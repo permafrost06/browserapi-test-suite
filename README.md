@@ -15,7 +15,7 @@ pnpm run dev
 All the tests are in `src/main.ts` file.
 
 Nginx reverse proxy config example:
-```
+```nginx
 location /cloud-tester {
     rewrite /cloud-tester/(.*) /$1  break;
     proxy_set_header Upgrade $http_upgrade;
