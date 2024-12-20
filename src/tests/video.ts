@@ -1,6 +1,7 @@
 import HTMLMediaElement from "./HTMLMediaElement";
+import sampleVideoFile from "../../test-files/sample-10s.mp4";
 
-const localVideoFile = "/sample-10s.mp4";
+const localVideoFile = sampleVideoFile;
 export const localVideoTest = HTMLMediaElement(
     "localVideoTest",
     "video",
