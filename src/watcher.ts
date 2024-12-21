@@ -9,7 +9,8 @@ class MessagingWebSocket extends WebSocket {
 }
 
 const statusElement = document.getElementById("status")!;
-const ws = new MessagingWebSocket(`ws://${location.host}`);
+
+const ws = new MessagingWebSocket(import.meta.env.VITE_WSHOST);
 
 ws.onopen = () => {
     statusElement.textContent = "WebSocket connection established!";

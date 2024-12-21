@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "concurrently \"vite build --watch\" \"nodemon\"",
+        "dev": "concurrently \"vite build --watch --mode development\" \"nodemon\"",
         "build": "tsc && vite build",
         "preview": "vite preview",
         "start": "node --experimental-strip-types server.ts"

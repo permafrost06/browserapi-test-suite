@@ -16,7 +16,7 @@ const reports: Record<string, Array<{
         tests: suite.getTests()
     }));
 
-    await fetch("http://localhost:5173/register-test-runner", {
+    await fetch(`${import.meta.env.VITE_HOST}/register-test-runner`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -30,7 +30,7 @@ const reports: Record<string, Array<{
         reports[suiteName] = await suite.run();
     }
 
-    await fetch("http://localhost:5173/remove-test-runner", {
+    await fetch(`${import.meta.env.VITE_HOST}/remove-test-runner`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
