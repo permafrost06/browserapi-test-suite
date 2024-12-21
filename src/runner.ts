@@ -9,6 +9,7 @@ const reports: Record<string, Array<{
 
 (async () => {
     const id = Math.floor(1000 + Math.random() * 9000);
+    document.querySelector<HTMLDivElement>("#id_display")!.innerText = String(id);
 
     const testSuites = suites.map(suite => ({
         name: suite.suiteName,

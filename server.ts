@@ -5,6 +5,16 @@ import { WebSocketServer, WebSocket } from "ws";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
+class MessagingWebSocket extends WebSocket {
+    sendMessage<T extends {}>(message: string, data: T) {
+        const payload = JSON.stringify({
+            message,
+            data
+        });
+        this.send(payload);
+    }
+}
+
 type TestSuiteDescription = {
     id: number;
     suites: string[];
@@ -18,6 +28,11 @@ let registeredRunners: Array<{
     id: number;
     suites: TestSuiteDescription[]
 }> = [];
+
+let sockets: {
+    runnerID?: number;
+    socket: WebSocket;
+}[] = [];
 
 app.use(express.static("dist"));
 app.use(express.json());
@@ -39,6 +54,11 @@ app.post("/register-test-runner", (req, res) => {
         id: req.body.id,
         suites: req.body.testSuites,
     });
+
+    if (registeredRunners.length === 1) {
+        sockets = sockets.map(socket => socket.runnerID = req.body.id);
+    }
+
     res.status(200).send();
 });
 
@@ -49,20 +69,70 @@ app.post("/remove-test-runner", (req, res) => {
 });
 
 const server = createServer(app);
-const wsServer = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({
+    server,
+    WebSocket: MessagingWebSocket
+});
 
-wsServer.on("connection", (ws) => {
-    console.log("Client connected");
+const handleSocketMessage = (socket: MessagingWebSocket, message: string) => {
+    let payload: {
+        message?: string;
+        data?: Record<string, any>;
+    } = {};
 
-    ws.send("Hello from WebSocket server!");
+    try {
+        payload = JSON.parse(message);
+    } catch(e) {
+        console.log("received message is not JSON");
+    }
 
-    ws.on("message", (message: string) => {
-        console.log(`Received message: ${message}`);
+    if (!payload.message) {
+        console.log("invalid message received");
+        return
+    }
+
+    if (payload.message === "runner-selection") {
+        sockets.find(
+            sock => sock.socket === socket
+        )!.runnerID = payload.data?.runnerID;
+
+        socket.sendMessage("runner-connected", {
+            runnerID: payload.data?.runnerID
+        });
+    }
+}
+
+wsServer.on("connection", (socket) => {
+    socket.on("close", () => {
+        sockets = sockets.filter(sock => sock.socket === socket);
     });
 
-    ws.on("close", () => {
-        console.log("Client disconnected");
+    socket.on("message", (message: string) => {
+        handleSocketMessage(socket, message);
     });
+
+    if (registeredRunners.length === 1) {
+        sockets.push({
+            runnerID: registeredRunners[0].id,
+            socket,
+        });
+
+        socket.sendMessage("runner-connected", {
+            runnerID: registeredRunners[0].id
+        });
+
+        return;
+    }
+
+    sockets.push({
+        socket,
+    });
+
+    if (registeredRunners.length > 1) {
+        socket.sendMessage("select-runner", {
+            runnerIDs: registeredRunners.map(runner => runner.id)
+        });
+    }
 });
 
 server.listen(PORT, () => {
