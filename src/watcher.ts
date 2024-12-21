@@ -16,17 +16,17 @@ ws.onopen = () => {
 };
 
 ws.onmessage = (event) => {
-    const payload = JSON.parse(event.data);
+    const { message, data } = JSON.parse(event.data);
 
-    if (payload.message === "select-runner") {
-        const { runnerIDs } = payload.data;
+    if (message === "select-runner") {
+        const { runnerIDs } = data;
         ws.sendMessage("runner-selection", {
             runnerID: runnerIDs[runnerIDs.length - 1]
         });
     }
 
-    if (payload.message === "runner-connected") {
-         document.querySelector<HTMLDivElement>("#id_display")!.innerText = payload.data.runnerID;
+    if (message === "runner-connected") {
+        document.querySelector<HTMLDivElement>("#id_display")!.innerText = data.id;
     }
 };
 

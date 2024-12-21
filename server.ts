@@ -29,9 +29,9 @@ let registeredRunners: Array<{
     suites: TestSuiteDescription[]
 }> = [];
 
-let sockets: {
+let connections: {
     runnerID?: number;
-    socket: WebSocket;
+    socket: MessagingWebSocket;
 }[] = [];
 
 app.use(express.static("dist"));
@@ -56,7 +56,16 @@ app.post("/register-test-runner", (req, res) => {
     });
 
     if (registeredRunners.length === 1) {
-        sockets = sockets.map(socket => socket.runnerID = req.body.id);
+        connections = connections.map(conn => ({
+            ...conn,
+            runnerID: req.body.id,
+        }));
+        connections.forEach(connection => {
+            connection.socket.sendMessage(
+                "runner-connected",
+                registeredRunners[0]
+            );
+        });
     }
 
     res.status(200).send();
@@ -82,29 +91,32 @@ const handleSocketMessage = (socket: MessagingWebSocket, message: string) => {
 
     try {
         payload = JSON.parse(message);
-    } catch(e) {
+    } catch (e) {
         console.log("received message is not JSON");
     }
 
-    if (!payload.message) {
+    if (!payload.message || !payload.data) {
         console.log("invalid message received");
         return
     }
 
     if (payload.message === "runner-selection") {
-        sockets.find(
-            sock => sock.socket === socket
-        )!.runnerID = payload.data?.runnerID;
+        const { runnerID } = payload.data;
 
-        socket.sendMessage("runner-connected", {
-            runnerID: payload.data?.runnerID
-        });
+        connections.find(
+            sock => sock.socket === socket
+        )!.runnerID = runnerID;
+
+        socket.sendMessage(
+            "runner-connected",
+            registeredRunners.find(runner => runner.id === runnerID)!
+        );
     }
 }
 
 wsServer.on("connection", (socket) => {
     socket.on("close", () => {
-        sockets = sockets.filter(sock => sock.socket === socket);
+        connections = connections.filter(sock => sock.socket === socket);
     });
 
     socket.on("message", (message: string) => {
@@ -112,19 +124,17 @@ wsServer.on("connection", (socket) => {
     });
 
     if (registeredRunners.length === 1) {
-        sockets.push({
+        connections.push({
             runnerID: registeredRunners[0].id,
             socket,
         });
 
-        socket.sendMessage("runner-connected", {
-            runnerID: registeredRunners[0].id
-        });
+        socket.sendMessage("runner-connected", registeredRunners[0]);
 
         return;
     }
 
-    sockets.push({
+    connections.push({
         socket,
     });
 
