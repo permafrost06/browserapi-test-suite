@@ -98,6 +98,10 @@ export default function TestSuite<T>(
         await logger(name, comment);
     }
 
-    return { run, addTest, suiteName: name }
+    function getTests() {
+        return tests.map(test => test.description);
+    }
+
+    return { run, addTest, suiteName: name, getTests }
 }
 

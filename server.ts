@@ -5,11 +5,22 @@ import { WebSocketServer, WebSocket } from "ws";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
+type TestSuiteDescription = {
+    id: number;
+    suites: string[];
+}
+
 const app = express();
-const PORT = 3000;
+const PORT = 5173;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+let registeredRunners: Array<{
+    id: number;
+    suites: TestSuiteDescription[]
+}> = [];
+
 app.use(express.static("dist"));
+app.use(express.json());
 
 app.get("/", (_: Request, res: Response) => {
     res.sendFile(join(__dirname, "dist", "index.html"));
@@ -21,6 +32,20 @@ app.get("/watcher", (_: Request, res: Response) => {
 
 app.get("/runner", (_: Request, res: Response) => {
     res.sendFile(join(__dirname, "dist", "runner.html"));
+});
+
+app.post("/register-test-runner", (req, res) => {
+    registeredRunners.push({
+        id: req.body.id,
+        suites: req.body.testSuites,
+    });
+    res.status(200).send();
+});
+
+app.post("/remove-test-runner", (req, res) => {
+    registeredRunners = registeredRunners
+        .filter(runner => runner.id !== req.body.id);
+    res.status(200).send();
 });
 
 const server = createServer(app);

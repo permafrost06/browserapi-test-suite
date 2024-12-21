@@ -1,4 +1,4 @@
-import tests from "./tests";
+import suites from "./tests";
 
 const reports: Record<string, Array<{
     type: "comment" | "result",
@@ -8,10 +8,35 @@ const reports: Record<string, Array<{
 }>> = {};
 
 (async () => {
-    for (const test of tests) {
-        const suiteName = test.suiteName;
-        reports[suiteName] = await test.run();
+    const id = Math.floor(1000 + Math.random() * 9000);
+
+    const testSuites = suites.map(suite => ({
+        name: suite.suiteName,
+        tests: suite.getTests()
+    }));
+
+    await fetch("http://localhost:5173/register-test-runner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id,
+            testSuites,
+        }),
+    });
+
+    for (const suite of suites) {
+        const suiteName = suite.suiteName;
+        reports[suiteName] = await suite.run();
     }
+
+    await fetch("http://localhost:5173/remove-test-runner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id,
+        }),
+    });
+
     // window.reports = reports;
     document.body.innerText = "All tests have finished running"
     // const pre = document.createElement("pre");
