@@ -1,0 +1,40 @@
+* {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.watcher {
+    padding: 1rem;
+    padding-bottom: 2rem;
+}
+
+h1 {
+    margin-bottom: .75rem;
+}
+
+.suite-container {
+    .suite-name {
+    }
+
+    .tests-container {
+        margin-left: 1rem;
+        
+        .test {
+            margin-block: .25rem;
+        }
+    }
+
+    padding-bottom: .5rem;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    background-color: inherit;
+    padding-right: 1rem;
+    text-align: right;
+}

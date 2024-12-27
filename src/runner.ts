@@ -11,17 +11,11 @@ const reports: Record<string, Array<{
     const id = Math.floor(1000 + Math.random() * 9000);
     document.querySelector<HTMLDivElement>("#id_display")!.innerText = String(id);
 
-    const testSuites = suites.map(suite => ({
-        name: suite.suiteName,
-        tests: suite.getTests()
-    }));
-
     await fetch(`${import.meta.env.VITE_HOST}/register-test-runner`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             id,
-            testSuites,
         }),
     });
 

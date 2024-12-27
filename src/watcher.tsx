@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import suites from "./tests";
+import "./watcher.css";
 
 class MessagingWebSocket extends WebSocket {
     sendMessage<T extends {}>(message: string, data: T) {
@@ -12,14 +14,21 @@ class MessagingWebSocket extends WebSocket {
 }
 
 function WatcherApp() {
-    const [message, setMessage] = useState("Connecting to websocket...");
+    const [wsStatus, setWsStatus] = useState<
+        "CONNECTING" | "CONNECTED" | "DISCONNECTED" | "ERROR"
+    >("CONNECTING");
     const [id, setId] = useState("");
+
+    const testSuites = suites.map(suite => ({
+        name: suite.suiteName,
+        tests: suite.getTests()
+    }));
 
     useEffect(() => {
         const ws = new MessagingWebSocket(import.meta.env.VITE_WSHOST);
 
         ws.onopen = () => {
-            setMessage("WebSocket connection established!");
+            setWsStatus("CONNECTED");
         };
 
         ws.onmessage = (event) => {
@@ -38,20 +47,30 @@ function WatcherApp() {
         };
 
         ws.onclose = () => {
-            setMessage("WebSocket connection closed.");
+            setWsStatus("DISCONNECTED");
             ws.close()
         };
 
-        ws.onerror = (error) => {
-            setMessage("WebSocket error occurred.");
+        ws.onerror = () => {
+            setWsStatus("ERROR");
         };
 
         return () => ws.close();
     }, []);
 
     return <>
-        <p id="status">{message}</p>
-        <p id="id_display">{id}</p>
+        <div className="watcher">
+            <h1>Tests Watcher</h1>
+            {testSuites.map(suite => <div className="suite-container">
+                <div className="suite-name">{suite.name}</div>
+                <div className="tests-container">
+                    {suite.tests.map(test => <div className="test">{test}</div>)}
+                </div>
+            </div>)}
+        </div>
+        <footer>
+            {wsStatus}{id && ` - ${id}`}
+        </footer>
     </>;
 }
 

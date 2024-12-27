@@ -15,19 +15,11 @@ class MessagingWebSocket extends WebSocket {
     }
 }
 
-type TestSuiteDescription = {
-    id: number;
-    suites: string[];
-}
-
 const app = express();
 const PORT = 5173;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-let registeredRunners: Array<{
-    id: number;
-    suites: TestSuiteDescription[]
-}> = [];
+let registeredRunners: Array<number> = [];
 
 let connections: {
     runnerID?: number;
@@ -50,10 +42,7 @@ app.get("/runner", (_: Request, res: Response) => {
 });
 
 app.post("/register-test-runner", (req, res) => {
-    registeredRunners.push({
-        id: req.body.id,
-        suites: req.body.testSuites,
-    });
+    registeredRunners.push(req.body.id);
 
     if (registeredRunners.length === 1) {
         connections = connections.map(conn => ({
@@ -73,7 +62,7 @@ app.post("/register-test-runner", (req, res) => {
 
 app.post("/remove-test-runner", (req, res) => {
     registeredRunners = registeredRunners
-        .filter(runner => runner.id !== req.body.id);
+        .filter(id => id !== req.body.id);
     res.status(200).send();
 });
 
@@ -109,7 +98,7 @@ const handleSocketMessage = (socket: MessagingWebSocket, message: string) => {
 
         socket.sendMessage(
             "runner-connected",
-            registeredRunners.find(runner => runner.id === runnerID)!
+            registeredRunners.find(id => id === runnerID)!
         );
     }
 }
@@ -125,7 +114,7 @@ wsServer.on("connection", (socket) => {
 
     if (registeredRunners.length === 1) {
         connections.push({
-            runnerID: registeredRunners[0].id,
+            runnerID: registeredRunners[0],
             socket,
         });
 
@@ -140,7 +129,7 @@ wsServer.on("connection", (socket) => {
 
     if (registeredRunners.length > 1) {
         socket.sendMessage("select-runner", {
-            runnerIDs: registeredRunners.map(runner => runner.id)
+            runnerIDs: registeredRunners
         });
     }
 });
