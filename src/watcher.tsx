@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import suites from "./tests";
 import "./watcher.css";
@@ -14,36 +14,72 @@ class MessagingWebSocket extends WebSocket {
 }
 
 function WatcherApp() {
+    const socket = useRef<MessagingWebSocket | undefined>(undefined);
     const [wsStatus, setWsStatus] = useState<
         "CONNECTING" | "CONNECTED" | "DISCONNECTED" | "ERROR"
     >("CONNECTING");
     const [id, setId] = useState("");
 
-    const testSuites = suites.map(suite => ({
+    const [status, setStatus] = useState(suites.map(suite => ({
         name: suite.suiteName,
-        tests: suite.getTests()
-    }));
+        tests: suite.getTests().map(test => ({
+            description: test,
+            status: undefined as "pass" | "fail" | undefined
+        }))
+    })));
+
+    function handleUpdate(data: {
+        suiteName: string;
+        test: string;
+        result: "pass" | "fail",
+    }) {
+        const { suiteName, test, result } = data;
+
+        const suiteIdx = status.findIndex(suite => suite.name === suiteName);
+        const testIdx = status[suiteIdx].tests.findIndex(t => t.description === test);
+        let newStatus = [...status];
+        newStatus[suiteIdx].tests[testIdx].status = result;
+
+        setStatus(newStatus);
+    }
+
+    function handleMessage(message: string, data: Record<string, any>) {
+        if (!socket.current) {
+            return;
+        }
+
+        switch (message) {
+            case "select-runner":
+                const { runnerIDs } = data;
+                socket.current.sendMessage("runner-selection", {
+                    runnerID: runnerIDs[runnerIDs.length - 1]
+                });
+                break;
+            case "runner-connected":
+                setId(data.id);
+                break;
+            case "update":
+                handleUpdate(data as {
+                    suiteName: string;
+                    test: string;
+                    result: "pass" | "fail",
+                });
+                break;
+        }
+    }
 
     useEffect(() => {
         const ws = new MessagingWebSocket(import.meta.env.VITE_WSHOST);
 
         ws.onopen = () => {
             setWsStatus("CONNECTED");
+            socket.current = ws;
         };
 
         ws.onmessage = (event) => {
             const { message, data } = JSON.parse(event.data);
 
-            if (message === "select-runner") {
-                const { runnerIDs } = data;
-                ws.sendMessage("runner-selection", {
-                    runnerID: runnerIDs[runnerIDs.length - 1]
-                });
-            }
-
-            if (message === "runner-connected") {
-                setId(data.id);
-            }
+            handleMessage(message, data);
         };
 
         ws.onclose = () => {
@@ -61,10 +97,15 @@ function WatcherApp() {
     return <>
         <div className="watcher">
             <h1>Tests Watcher</h1>
-            {testSuites.map(suite => <div className="suite-container">
+            {status.map(suite => <div className="suite-container">
                 <div className="suite-name">{suite.name}</div>
                 <div className="tests-container">
-                    {suite.tests.map(test => <div className="test">{test}</div>)}
+                    {suite.tests.map(test => <div className="test">
+                        {test.description} <span>
+                            {test.status === "pass" && "✔️"}
+                            {test.status === "fail" && "❌"}
+                        </span>
+                    </div>)}
                 </div>
             </div>)}
         </div>

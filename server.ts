@@ -60,6 +60,18 @@ app.post("/register-test-runner", (req, res) => {
     res.status(200).send();
 });
 
+app.post("/publish-test-result", (req, res) => {
+    const { id, suiteName, test, result } = req.body;
+
+    const filteredConns = connections.filter(conn => conn.runnerID === id);
+
+    filteredConns.forEach(({ socket }) => socket.sendMessage("update", {
+        suiteName, test, result
+    }));
+
+    res.status(200).send();
+});
+
 app.post("/remove-test-runner", (req, res) => {
     registeredRunners = registeredRunners
         .filter(id => id !== req.body.id);
