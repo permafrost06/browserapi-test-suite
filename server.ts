@@ -52,7 +52,7 @@ app.post("/register-test-runner", (req, res) => {
         connections.forEach(connection => {
             connection.socket.sendMessage(
                 "runner-connected",
-                registeredRunners[0]
+                { id: registeredRunners[0] }
             );
         });
     }
@@ -98,7 +98,7 @@ const handleSocketMessage = (socket: MessagingWebSocket, message: string) => {
 
         socket.sendMessage(
             "runner-connected",
-            registeredRunners.find(id => id === runnerID)!
+            { id: registeredRunners.find(id => id === runnerID) }
         );
     }
 }
@@ -118,7 +118,7 @@ wsServer.on("connection", (socket) => {
             socket,
         });
 
-        socket.sendMessage("runner-connected", registeredRunners[0]);
+        socket.sendMessage("runner-connected", { id: registeredRunners[0] });
 
         return;
     }
