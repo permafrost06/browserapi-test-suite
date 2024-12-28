@@ -24,7 +24,8 @@ function WatcherApp() {
         name: suite.suiteName,
         tests: suite.getTests().map(test => ({
             description: test,
-            status: undefined as "pass" | "fail" | undefined
+            status: undefined as "pass" | "fail" | undefined,
+            error: undefined as string | undefined,
         }))
     })));
 
@@ -32,13 +33,18 @@ function WatcherApp() {
         suiteName: string;
         test: string;
         result: "pass" | "fail",
+        error: string,
     }) {
-        const { suiteName, test, result } = data;
+        const { suiteName, test, result, error } = data;
 
         const suiteIdx = status.findIndex(suite => suite.name === suiteName);
         const testIdx = status[suiteIdx].tests.findIndex(t => t.description === test);
         let newStatus = [...status];
         newStatus[suiteIdx].tests[testIdx].status = result;
+        
+        if (error) {
+            newStatus[suiteIdx].tests[testIdx].error = error;
+        }
 
         setStatus(newStatus);
     }
@@ -62,7 +68,8 @@ function WatcherApp() {
                 handleUpdate(data as {
                     suiteName: string;
                     test: string;
-                    result: "pass" | "fail",
+                    result: "pass" | "fail";
+                    error: string;
                 });
                 break;
         }
@@ -101,10 +108,15 @@ function WatcherApp() {
                 <div className="suite-name">{suite.name}</div>
                 <div className="tests-container">
                     {suite.tests.map(test => <div className="test">
-                        {test.description} <span>
-                            {test.status === "pass" && "✔️"}
-                            {test.status === "fail" && "❌"}
-                        </span>
+                        <div className="test-desc">
+                            {test.description} <span>
+                                {test.status === "pass" && "✔️"}
+                                {test.status === "fail" && "❌"}
+                            </span>
+                        </div>
+                        {test.error && <div className="error">
+                            {test.error}
+                        </div>}
                     </div>)}
                 </div>
             </div>)}

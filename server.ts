@@ -61,12 +61,12 @@ app.post("/register-test-runner", (req, res) => {
 });
 
 app.post("/publish-test-result", (req, res) => {
-    const { id, suiteName, test, result } = req.body;
+    const { id, suiteName, test, result, error } = req.body;
 
     const filteredConns = connections.filter(conn => conn.runnerID === id);
 
     filteredConns.forEach(({ socket }) => socket.sendMessage("update", {
-        suiteName, test, result
+        suiteName, test, result, error
     }));
 
     res.status(200).send();
