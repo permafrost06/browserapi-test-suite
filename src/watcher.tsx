@@ -23,6 +23,7 @@ function WatcherApp() {
     const [status, setStatus] = useState(suites.map(suite => ({
         name: suite.suiteName,
         tests: suite.getTests().map(test => ({
+            id: Math.floor(1000 + Math.random() * 9000),
             description: test,
             status: undefined as "pass" | "fail" | undefined,
             error: undefined as string | undefined,
@@ -39,6 +40,7 @@ function WatcherApp() {
 
         const suiteIdx = status.findIndex(suite => suite.name === suiteName);
         const testIdx = status[suiteIdx].tests.findIndex(t => t.description === test);
+
         let newStatus = [...status];
         newStatus[suiteIdx].tests[testIdx].status = result;
         
@@ -47,6 +49,12 @@ function WatcherApp() {
         }
 
         setStatus(newStatus);
+
+        const testEl = document.querySelector(
+            "#test-" + newStatus[suiteIdx].tests[testIdx].id
+        );
+
+        testEl?.scrollIntoView();
     }
 
     function handleMessage(message: string, data: Record<string, any>) {
@@ -107,7 +115,7 @@ function WatcherApp() {
             {status.map(suite => <div className="suite-container">
                 <div className="suite-name">{suite.name}</div>
                 <div className="tests-container">
-                    {suite.tests.map(test => <div className="test">
+                    {suite.tests.map(test => <div id={"test-" + test.id} className="test">
                         <div className="test-desc">
                             {test.description} <span>
                                 {test.status === "pass" && "✔️"}
