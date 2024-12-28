@@ -1,5 +1,5 @@
 import HTMLMediaElement from "./HTMLMediaElement";
-import sampleVideoFile from "../../test-files/sample-10s.mp4";
+import sampleVideoFile from "../../test-files/sample-10s.mp4?inline";
 
 const localVideoFile = sampleVideoFile;
 export const localVideoTest = HTMLMediaElement(

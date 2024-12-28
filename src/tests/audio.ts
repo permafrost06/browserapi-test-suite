@@ -1,6 +1,6 @@
 import HTMLMediaElement from "./HTMLMediaElement";
 import WebAudio from "./WebAudio";
-import sampleAudioFile from "../../test-files/sample-9s.mp3";
+import sampleAudioFile from "../../test-files/sample-9s.mp3?inline";
 
 const localAudioFile = sampleAudioFile;
 export const localAudioTest = HTMLMediaElement(
