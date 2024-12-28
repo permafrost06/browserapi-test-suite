@@ -40,7 +40,5 @@ const reports: Record<string, Array<{
         suites: reports,
     };
 
-    const pre = document.createElement("pre");
-    pre.innerText += JSON.stringify(output, null, 4);
-    document.body.appendChild(pre);
+    window.location.href = `${import.meta.env.VITE_HOST}/view-result?result=${encodeURIComponent(JSON.stringify(output))}`;
 })()

@@ -78,6 +78,11 @@ app.post("/remove-test-runner", (req, res) => {
     res.status(200).send();
 });
 
+app.get("/view-result", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(req.query.result);
+});
+
 const server = createServer(app);
 const wsServer = new WebSocketServer({
     server,
