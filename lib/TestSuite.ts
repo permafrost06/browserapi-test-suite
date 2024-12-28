@@ -54,7 +54,7 @@ export default function TestSuite<T>(
         type: "comment" | "result",
         content: string;
         status?: "pass" | "fail";
-        failReason?: Error;
+        failReason?: string;
     }> = [];
 
     async function addTest(
@@ -76,11 +76,12 @@ export default function TestSuite<T>(
                 await test.testFn(props, { delay, waitUntil }, logComment);
             } catch (e) {
                 await errorLogger(name, test.description, e as Error);
+                const { name: errorName, message: errorMessage } = e as Error;
                 logs.push({
                     type: "result",
                     content: test.description,
                     status: "fail",
-                    failReason: e as Error
+                    failReason: `${errorName}: ${errorMessage}`
                 });
                 continue;
             }
