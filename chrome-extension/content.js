@@ -5,7 +5,7 @@ setTimeout(function() {
     div.classList.add("injected-iframe-container");
 
     const frame = document.createElement("iframe");
-    frame.src = "http://localhost:5173/watcher";
+    frame.src = "https://permafrost06.com/cloud-tester/watcher";
 
     const toggle = document.createElement("div");
     toggle.classList.add("injected-iframe-toggle");
