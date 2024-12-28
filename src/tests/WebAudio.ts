@@ -73,8 +73,10 @@ export default function WebAudio(
             pauseDispatched = true;
         });
 
+        await props.mediaEl.play();
+        assert(props.mediaEl.paused === false);
         props.mediaEl.pause();
-        assert(props.mediaEl.paused === true);
+        assert((props.mediaEl.paused as boolean) === true);
 
         await waitUntil(() => pauseDispatched === true);
     });
